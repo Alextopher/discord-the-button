@@ -106,13 +106,16 @@ func main() {
 			if err != nil {
 				fmt.Println("Error updating user: ", err)
 			} else {
-				state = ButtonPurple
-				t, err := updateState(session, guild, channel, state)
-				if err != nil {
-					fmt.Println("Error updating state: ", err)
+				if state != ButtonPurple {
+					state = ButtonPurple
+					_, err := updateState(session, guild, channel, state)
+					if err != nil {
+						fmt.Println("Error updating state: ", err)
+					}
 				}
+
 				timer.Stop()
-				timer = time.NewTimer(24*time.Hour - t)
+				timer = time.NewTimer(24 * time.Hour)
 			}
 		}
 	}
