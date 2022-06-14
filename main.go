@@ -78,6 +78,12 @@ func main() {
 		fmt.Println("countinuing from state: ", state.Role())
 	}
 
+	_, err = updateState(session, guild, channel, state)
+	if err != nil {
+		fmt.Println("Error updating state: ", err)
+		os.Exit(1)
+	}
+
 	// run the bot forever
 	timer := time.NewTimer(24 * time.Hour)
 	for {
