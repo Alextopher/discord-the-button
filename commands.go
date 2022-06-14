@@ -56,7 +56,7 @@ var handlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCre
 		}
 	},
 	"source": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		sendMessage(s, i.Interaction, "I haven't open sourced it yet plz wait")
+		sendMessage(s, i.Interaction, "https://github.com/Alextopher/discord-the-button")
 	},
 }
 
