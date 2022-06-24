@@ -95,6 +95,8 @@ func (b ButtonState) Next() ButtonState {
 		return ButtonRed
 	case ButtonRed:
 		return ButtonDead
+	case ButtonDead:
+		return ButtonPurple
 	default:
 		return ButtonDead
 	}

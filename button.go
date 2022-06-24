@@ -79,8 +79,14 @@ func updateUser(s *discordgo.Session, guildID, userID string, state ButtonState)
 		return err
 	}
 
+	// remove all color roles and check if the user has the red role
+	hasRed := false
 	for _, r := range user.Roles {
-		if _, ok := roleToButtonState[r]; ok {
+		if color, ok := roleToButtonState[r]; ok {
+			if color == ButtonRed {
+				hasRed = true
+			}
+
 			err := s.GuildMemberRoleRemove(guildID, userID, r)
 			if err != nil {
 				return err
@@ -88,7 +94,13 @@ func updateUser(s *discordgo.Session, guildID, userID string, state ButtonState)
 		}
 	}
 
-	return s.GuildMemberRoleAdd(guildID, userID, roleID)
+	// Red loses it's role if they push the button while it is red
+	// this means red users can not keep the button alive without personal cost
+	if hasRed && state == ButtonRed {
+		return nil
+	} else {
+		return s.GuildMemberRoleAdd(guildID, userID, roleID)
+	}
 }
 
 // sets the name of the button channel to match the state
@@ -99,4 +111,26 @@ func updateState(s *discordgo.Session, guildID, channelID string, state ButtonSt
 	_, err := s.ChannelEdit(channelID, state.Channel())
 	fmt.Println("Changed!")
 	return time.Since(start), err
+}
+
+// remove all color roles from all users
+func endButton(s *discordgo.Session, guildID string) error {
+	// TODO should this work with more than 1000 users?
+	users, err := s.GuildMembers(guildID, "", 1000)
+	if err != nil {
+		return err
+	}
+
+	for _, user := range users {
+		for _, role := range user.Roles {
+			if _, ok := roleToButtonState[role]; ok {
+				err := s.GuildMemberRoleRemove(guildID, user.User.ID, role)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	return nil
 }

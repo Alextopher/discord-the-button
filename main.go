@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"time"
 
@@ -90,17 +91,24 @@ func main() {
 		select {
 		case <-timer.C:
 			state = state.Next()
+
+			// if the button just died
 			if state == ButtonDead {
-				// TODO: remove all roles from all users and wait 1 week before resetting the button
-				fmt.Println("Button died")
-			}
+				endButton(session, guild)
 
-			t, err := updateState(session, guild, channel, state)
-			if err != nil {
-				fmt.Println("Error updating state: ", err)
-			}
+				// sleep for 1 week
+				timer = time.NewTimer(7 * 24 * time.Hour)
+			} else {
+				t, err := updateState(session, guild, channel, state)
+				if err != nil {
+					fmt.Println("Error updating state: ", err)
+				}
 
-			timer = time.NewTimer(24*time.Hour - t)
+				// choose new timer duration between 12 hours and 24 hours
+				wait := time.Duration(rand.Intn(12)+12) * time.Hour
+
+				timer = time.NewTimer(wait - t)
+			}
 		case pusher := <-pushers:
 			err = updateUser(session, guild, pusher, state)
 			if err != nil {
