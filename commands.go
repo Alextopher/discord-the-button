@@ -52,7 +52,7 @@ var handlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCre
 		// send a message to the channel
 		err := sendMessage(s, i.Interaction, "PUSHED!")
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("failed to respond:" err)
 		}
 	},
 	"source": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
