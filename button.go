@@ -22,7 +22,9 @@ func verifyRoles(s *discordgo.Session, guildID string) {
 	// map of role names to role ids
 	roleToButtonState = make(map[string]ButtonState)
 	for _, role := range roles {
-		roleToButtonState[role.ID] = ButtonStateFromRole(role.Name)
+		if state := ButtonStateFromRole(role.Name); state != ButtonDead {
+			roleToButtonState[role.ID] = state
+		}
 	}
 
 	// if any role is missing it is added
